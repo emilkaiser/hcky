@@ -1,0 +1,163 @@
+</<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <style type='text/css'>
+    * {
+      background-color: grey;
+    }
+    .arena {
+      position: relative;
+      padding-bottom: 42.5%;
+      height: 0;
+    }
+    .infield {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /*width: 5000px;*/
+      min-width: 400px;
+      height: 100%;
+      /*height: 4000px;*/
+      min-height: 170px;
+    }
+  </style>
+</head>
+<body>
+  <div class="arena">
+    <svg class="infield" id="js-svg" viewBox="0 0 200 85" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <script type="text/javascript" src="svg.js"></script>
+  <script type="text/javascript">
+    var inch = 1/12;
+    var blue = "#0038A8";
+    var lightblue = "#57b5e0";
+    var red = "#CE1126";
+    var white = "#fff";
+
+    var s = SVG("js-svg");
+
+    var ice = s.rect(200, 85).radius(14, 14).fill(white).move(0, 0);
+
+    // zone details
+
+    // spots and circles
+    getCircleWithLines({radius: 15, border: inch * 2, color: red}).move(31, 20.5);
+    getSpotWithLines().move(31, 20.5);
+    getCircleWithLines({radius: 15, border: inch * 2, color: red}).move(31, 64.5);
+    getSpotWithLines().move(31, 64.5);
+    getCircleWithLines({radius: 15, border: inch * 2, color: red}).move(169, 20.5);
+    getSpotWithLines().move(169, 20.5);
+    getCircleWithLines({radius: 15, border: inch * 2, color: red}).move(169, 64.5);
+    getSpotWithLines().move(169, 64.5);
+
+
+    // lines
+
+    var bluelines = s.group();
+    bluelines.add(s.rect(1, 85).move(74, 0));
+    bluelines.add(s.rect(1, 85).move(125, 0));
+    bluelines.fill(blue);
+
+    var redlines = s.group();
+    redlines.add(s.rect(inch * 2, 85).move(11, 0));
+    redlines.add(s.rect(inch * 2, 85).move(189, 0));
+    redlines.fill(red);
+
+
+    // neutral zone details
+
+    getCircle({radius: 10, border: inch * 2, color: red}).move(100, 85);
+
+    var centerline = s.rect(1, 85).move(99.5, 0).fill(red);
+
+    // center circle
+    getCircle({radius: 15, border: inch * 2, color: blue}).move(100, 42.5);
+
+    var centerspot = s.circle().radius(inch * 6).fill(blue).move(100 - inch * 6, 42.5 - inch * 6);
+
+    // neutral zone spots
+    var spots = s.group();
+    spots.add(getSpot().move(80, 20.5));
+    spots.add(getSpot().move(80, 64.5));
+    spots.add(getSpot().move(120, 20.5));
+    spots.add(getSpot().move(120, 64.5));
+
+
+    // goal
+
+    // behind
+    s.polyline('0,28.5 11,33.5').stroke({ color: red, width: inch * 2 });
+    s.polyline('0,56.5 11,51.5').stroke({ color: red, width: inch * 2 });
+
+    s.polyline('200,28.5 189,33.5').stroke({ color: red, width: inch * 2 });
+    s.polyline('200,56.5 189,51.5').stroke({ color: red, width: inch * 2 });
+
+    // front
+    getGoalCrease().move(11 + inch * 2, 42.5);
+    getGoalCrease().move(189, 42.5).rotate(180);
+
+    function getSpot() {
+      var spot = s.group();
+      var inner = s.circle().radius(1 - (inch * 2)).fill(white);
+      var clip = s.rect(2 - (inch * 12), 2).move(-(inch * 6), -1);
+      spot.add(s.circle().radius(1).fill(red));
+      spot.add(inner);
+      spot.add(inner.clone().fill(red).clipWith(clip));
+      return spot;
+    }
+
+    function getCircle(conf) {
+      var circle = s.group();
+      circle.add(s.circle().radius(conf.radius).fill('none').attr({"stroke-width": inch * 2, stroke: conf.color}));
+      return circle;
+    }
+
+    function getSpotWithLines() {
+      var spot = getSpot();
+      spot.add(s.rect(inch * 2, 3).fill(red).move( -(2 + inch * 2) , -(3 + inch * 8) ));
+      spot.add(s.rect(inch * 2, 3).fill(red).move( -(2 + inch * 2) , inch * 8 ));
+      spot.add(s.rect(inch * 2, 3).fill(red).move( 2 , -(3 + inch * 8) ));
+      spot.add(s.rect(inch * 2, 3).fill(red).move( 2 , inch * 8 ));
+
+      spot.add(s.rect(3 + inch * 10, inch * 2).fill(red).move( -(3 + inch * 10 + 2 + inch * 2) , -(inch * 8 + inch * 2) ));
+      spot.add(s.rect(3 + inch * 10, inch * 2).fill(red).move( -(3 + inch * 10 + 2 + inch * 2) , (inch * 8) ));
+      spot.add(s.rect(3 + inch * 10, inch * 2).fill(red).move( 2 + inch * 2 , -(inch * 8 + inch * 2) ));
+      spot.add(s.rect(3 + inch * 10, inch * 2).fill(red).move( 2 + inch * 2 , inch * 8 ));
+
+      return spot;
+    }
+
+    function getCircleWithLines(conf) {
+      var circle = getCircle(conf);
+      circle.add(s.rect(inch * 2, 2).fill(conf.color).move( -(2 + inch * 2) , -(conf.radius + 2 - inch * 2) ));
+      circle.add(s.rect(inch * 2, 2).fill(conf.color).move( 2 , -(conf.radius + 2 - inch * 2) ));
+      circle.add(s.rect(inch * 2, 2).fill(conf.color).move( -(2 + inch * 2) , conf.radius - inch * 2 ));
+      circle.add(s.rect(inch * 2, 2).fill(conf.color).move( 2 , conf.radius - inch * 2 ));
+
+      return circle;
+    }
+
+    function getGoalCrease() {
+      var crease = s.group();
+
+      var clip = s.rect(3, 8).move(4, -4);
+      var circle = s.circle().radius(6).fill(lightblue).attr({"stroke-width": inch * 2, stroke: red});
+
+      crease.add(circle.clipWith(clip));
+      crease.add(s.rect(4 + inch * 6, inch * 2).fill(red).move(0, -4));
+      crease.add(s.rect(4 + inch * 6, inch * 2).fill(red).move(0, 4 - inch * 2));
+      crease.add(s.rect(4 + inch * 4, 8 - inch * 4).fill(lightblue).move(0, -4 + inch * 2));
+
+      crease.add(s.line(4, -4, 4, -3.3).attr({"stroke-width": inch * 2, stroke: red}));
+      crease.add(s.line(4, 4, 4, 3.3).attr({"stroke-width": inch * 2, stroke: red}));
+
+      return crease;
+    }
+
+  </script>
+</body>
+</html>
