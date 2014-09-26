@@ -37,6 +37,7 @@
     var lightblue = "#57b5e0";
     var red = "#CE1126";
     var white = "#fff";
+    var grey = "#b4babd";
 
     var s = SVG("js-svg");
 
@@ -98,7 +99,9 @@
 
     // front
     getGoalCrease().move(11 + inch * 2, 42.5);
+    getGoal().move(8, 39.6);
     getGoalCrease().move(189, 42.5).rotate(180);
+    getGoal().rotate(180).move(186.3, 39.6);
 
     function getSpot() {
       var spot = s.group();
@@ -156,6 +159,19 @@
       crease.add(s.line(4, 4, 4, 3.3).attr({"stroke-width": inch * 2, stroke: red}));
 
       return crease;
+    }
+
+    function getGoal() {
+      var goal = s.group();
+
+      var clip = s.rect(8, 8).move(-5, -1);
+      var clip2 = s.rect(8, 8).move(-5, -1);
+      var rect = s.rect(6, 6).radius(2, 2).fill('none').attr({"stroke-width": inch * 2, stroke: grey});
+      var rect2 = s.rect(4, 5).radius(1.5, 1.5).fill('none').attr({"stroke-width": inch * 2, stroke: grey}).move(1.5, 0.5);
+      goal.add(rect.clipWith(clip));
+      goal.add(rect2.clipWith(clip2));
+      goal.add(s.line(0, 3, 1.7, 3).attr({"stroke-width": inch * 2, stroke: grey}))
+      return goal;
     }
 
   </script>
