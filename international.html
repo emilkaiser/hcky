@@ -1,0 +1,261 @@
+</<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <style type='text/css'>
+    * {
+      background-color: grey;
+    }
+    .arena {
+      position: relative;
+      padding-bottom: 49.18%;
+      height: 0;
+    }
+    .infield {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /*width: 5000px;*/
+      min-width: 400px;
+      height: 100%;
+      /*height: 4000px;*/
+      min-height: 197px;
+    }
+  </style>
+</head>
+<body>
+  <div class="arena">
+    <svg class="infield" id="js-svg" viewBox="0 0 61 30" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <script type="text/javascript" src="svg.js"></script>
+  <script type="text/javascript">
+
+    // dimensions
+    var inch = 1/12;
+    function inches(nr) {
+      return nr * inch
+    }
+    var thin = 0.05;
+    var bold = 0.3;
+    var circledimension = 4.5;
+    var smallcircledimension = 3;
+    var spotdimension = 0.6;
+    var centerspotdimension = 0.15;
+    var width = 61;
+    var height = 30;
+    var tickred = 0.5;
+    var tickwhite = 1;
+    var behind_goal = false;
+    var faceOffShort = 0.9;
+    var faceOffLong = 1.2;
+    var goalwidth = 1.83;
+    var goalheight = 0.9;
+    var creaseradius = 1.8;
+
+    var circleWidthLineDistanceRatio = 170 / 120;
+    var circleWidthFaceOffLineDistanceRatio = 45 / 60;
+
+    var positions = {
+      circle_left_top: [10, 8],
+      circle_left_bottom: [10, 22],
+      circle_right_top: [width - 10, 8],
+      circle_right_bottom: [width - 10, 22],
+      blueline_left: 1/3 * width,
+      blueline_right: 2/3 * width,
+      redline_left: 4,
+      redline_right: width - 4,
+      spot_left_top: [1/3 * width + 1.5, 8],
+      spot_left_bottom: [1/3 * width + 1.5, 22],
+      spot_right_top: [2/3 * width - 1.5, 8],
+      spot_right_bottom: [2/3 * width - 1.5, 22],
+    };
+
+    // colors
+    var colors = {
+      blue: '#0038a8',
+      lightblue: '#57b5e0',
+      red: '#ce1126',
+      white: '#fff',
+      grey: '#b4babd'
+    };
+
+    var styles = {
+      thinred: {"stroke-width": thin, stroke: colors.red},
+      boldred: {"stroke-width": bold, stroke: colors.red},
+      thinblue: {"stroke-width": thin, stroke: colors.blue},
+      boldblue: {"stroke-width": bold, stroke: colors.blue},
+      goal: {"stroke-width": thin, stroke: colors.grey}
+    };
+
+    var s = SVG("js-svg");
+
+    // white ice
+    var ice = s.rect(61, 30).radius(7, 7).fill(colors.white).move(0, 0);
+
+    // neutral zone spots and circles
+    neutralcircle().move(positions.circle_left_top[0], positions.circle_left_top[1]);
+    neutralspot().move(positions.circle_left_top[0], positions.circle_left_top[1]);
+    neutralcircle().move(positions.circle_left_bottom[0], positions.circle_left_bottom[1]);
+    neutralspot().move(positions.circle_left_bottom[0], positions.circle_left_bottom[1]);
+    neutralcircle().move(positions.circle_right_top[0], positions.circle_right_top[1]);
+    neutralspot().move(positions.circle_right_top[0], positions.circle_right_top[1]);
+    neutralcircle().move(positions.circle_right_bottom[0], positions.circle_right_bottom[1]);
+    neutralspot().move(positions.circle_right_bottom[0], positions.circle_right_bottom[1]);
+
+    // blue lines
+    s.line(positions.blueline_left + bold/2, 0, positions.blueline_left + bold/2, height).attr(styles.boldblue);
+    s.line(positions.blueline_right + bold/2, 0, positions.blueline_right + bold/2, height).attr(styles.boldblue);
+
+    // red lines
+    s.line(positions.redline_left + thin, 0, positions.redline_left + thin, height).attr(styles.thinred);
+    s.line(positions.redline_right + thin, 0, positions.redline_right + thin, height).attr(styles.thinred);
+
+    // official circle
+    s.group().add(s.circle().radius(smallcircledimension).fill('none').attr(styles.thinred)).move(width/2, height);
+
+    // center line
+    s.line(width/2, 0, width/2, height).attr(styles.boldred);
+    var y = 0;
+    var paint = true;
+    while (paint) {
+      s.line(width/2, y+tickred, width/2, y+tickwhite).attr({"stroke-width": 0.8 * bold, stroke: colors.white});
+      y = y+tickwhite;
+      if (y > 100) {
+        paint = false
+      }
+    }
+
+    // center circle
+    s.group().add(s.circle().radius(circledimension).fill('none').attr(styles.thinblue)).move(width/2, height/2);
+
+    // center spot
+    s.circle().radius(centerspotdimension).fill(colors.blue).move(width/2 - centerspotdimension, height/2 - centerspotdimension);
+
+    // neutral zone spots
+    spot().move(positions.spot_left_top[0], positions.spot_left_top[1]);
+    spot().move(positions.spot_left_bottom[0], positions.spot_left_bottom[1]);
+    spot().move(positions.spot_right_top[0], positions.spot_right_top[1]);
+    spot().move(positions.spot_right_bottom[0], positions.spot_right_bottom[1]);
+
+    // behind goal
+    if (behind_goal) {
+      s.polyline('0,28.5 11,33.5').stroke({ color: colors.red, width: thin });
+      s.polyline('0,56.5 11,51.5').stroke({ color: colors.red, width: thin });
+      s.polyline('200,28.5 189,33.5').stroke({ color: colors.red, width: thin });
+      s.polyline('200,56.5 189,51.5').stroke({ color: colors.red, width: thin });
+    }
+
+    // crease and goal
+    internationalcrease().move(positions.redline_left + thin*1.5, height/2);
+    goal().move(positions.redline_left - goalheight, height/2 - goalwidth/2);
+    internationalcrease().move(positions.redline_right + thin*0.5, height/2).rotate(180);
+    goal().rotate(180).move(positions.redline_right - goalheight + thin, height/2 - goalwidth/2);
+
+    function spot() {
+      var group = s.group();
+
+      var clip = s.rect((spotdimension-thin-thin) * 0.7, spotdimension).move(-((spotdimension-thin-thin) * 0.7)/2, -spotdimension/2);
+
+      group.add(s.circle().radius(spotdimension/2).fill('none').attr(styles.thinred));
+      group.add(s.circle().radius(spotdimension/2).fill(colors.red).clipWith(clip));
+
+      return group;
+    }
+
+    function neutralspot() {
+      var group = spot();
+
+      var polyline = s.polyline([
+        [0, 0],
+        [0, faceOffShort - thin/2],
+        [faceOffLong - thin/2, faceOffShort - thin/2]
+      ]).fill('none').attr(styles.thinred).hide();
+
+      group.add(polyline.clone().show().rotate(180).move(faceOffShort*2, -circleWidthFaceOffLineDistanceRatio*spotdimension/2));
+      group.add(polyline.clone().show().scale(-1, -1).move(faceOffShort*2, -circleWidthFaceOffLineDistanceRatio*spotdimension/2));
+      group.add(polyline.clone().show().scale(1, -1).move(faceOffShort*2, -circleWidthFaceOffLineDistanceRatio*spotdimension/2));
+      group.add(polyline.clone().show().scale(-1, 1).move(faceOffShort*2, -circleWidthFaceOffLineDistanceRatio*spotdimension/2));
+
+      return group;
+    }
+
+    function neutralcircle() {
+      var group = s.group();
+
+      // circle
+      group.add(s.circle().radius(circledimension).fill('none').attr(styles.thinred));
+
+      // outer lines
+      var line = s.line(0, 0, 0, spotdimension).attr(styles.thinred);
+      group.add(line.move(-(circleWidthLineDistanceRatio*spotdimension + thin) , -(circledimension + spotdimension - thin)));
+      group.add(line.clone().move(circleWidthLineDistanceRatio*spotdimension , -(circledimension + spotdimension - thin)));
+      group.add(line.clone().move(-(circleWidthLineDistanceRatio*spotdimension + thin) , circledimension - thin));
+      group.add(line.clone().move(circleWidthLineDistanceRatio*spotdimension , circledimension - thin));
+
+      return group;
+    }
+
+    function crease() {
+      var group = s.group();
+
+      // round part of crease
+      var circle = s.circle().radius(6).fill(colors.lightblue).attr({"stroke-width": thin, stroke: colors.red});
+      var clip = s.rect(3, 8).move(4, -4);
+      group.add(circle.clipWith(clip));
+
+      // upper and lower border
+      group.add(s.line(0, -4 + thin/2, 4 + inches(6), -4 + thin/2).attr(styles.thinred));
+      group.add(s.line(0, 4 - thin/2, 4 + inches(6), 4 - thin/2).attr(styles.thinred));
+
+      // fill color
+      group.add(s.rect(4 + inch * 4, 8 - inch * 4).fill(colors.lightblue).move(0, -4 + thin));
+
+      // small lines
+      group.add(s.line(4, -4, 4, -3.3).attr(styles.thinred));
+      group.add(s.line(4, 4, 4, 3.3).attr(styles.thinred));
+
+      return group;
+    }
+
+    function internationalcrease() {
+      var group = s.group();
+
+      var polyline = s.polyline([
+        [0, 0],
+        [0, 0.15 - thin/2],
+        [0.15 - thin/2, 0.15 - thin/2]
+      ]).fill('none').attr(styles.thinred).hide();
+
+      var circle = s.circle().radius(creaseradius - thin*2).fill(colors.lightblue).attr({"stroke-width": thin, stroke: colors.red});
+      var clip = s.rect(creaseradius*2, creaseradius*3).move(0, -creaseradius*3/2);
+
+      group.add(circle.clipWith(clip));
+      group.add(polyline.clone().show().rotate(180).move(-1.22, 1));
+      group.add(polyline.clone().show().rotate(270).move(-1+0.15, 1.22));
+
+      return group;
+    }
+
+    function goal() {
+      var group = s.group();
+
+      // structure
+      var ice = s.rect(goalwidth, goalwidth).radius(goalwidth/3, goalwidth/3).fill('none').attr(styles.goal);
+      var crossbar = s.rect(goalwidth*4/6, goalwidth*5/6).radius(goalwidth/4, goalwidth/4).fill('none').attr(styles.goal).move(goalwidth/4, goalwidth/12);
+
+      var clip = s.rect(goalwidth*4/3, goalwidth*4/3).move(-goalwidth*5/6, -goalwidth/6);
+      group.add(ice.clipWith(clip));
+      group.add(crossbar.clipWith(clip.clone()));
+
+      // back pipe
+      group.add(s.line(0, goalwidth/2, goalwidth/3.75, goalwidth/2).attr(styles.goal))
+
+      return group;
+    }
+
+  </script>
+</body>
+</html>
