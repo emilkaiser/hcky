@@ -1,0 +1,61 @@
+</<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <style type='text/css'>
+    * {
+      background-color: grey;
+      width: 100%;
+      height: 100%;
+    }
+    .nhl svg,
+    .international svg {
+      width: 100vw;
+      height: 42.5vw;
+      max-height: 100vh;
+      margin: auto;
+      position: absolute;
+      top:0;bottom:0; /* vertical center */
+      left:0;right:0; /* horizontal center */
+    }
+    .international svg {
+      height: 49.18vw;
+    }
+    @media screen and (orientation:portrait) {
+      .nhl svg {
+        height: 100vh;
+        width: 42.5vh;
+      }
+      .international svg {
+        height: 100vh;
+        width: 42.5vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg id="js" xmlns="http://www.w3.org/2000/svg"></svg>
+  <script type="text/javascript" src="svg.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+  <script type="text/javascript">
+    var hcky = Hcky('js').nhl();
+    portrait = false;
+    if(window.innerHeight > window.innerWidth) {
+      portrait = true;
+      hcky.rotate();
+    }
+    window.addEventListener('resize', function () {
+      if(!portrait && window.innerHeight > window.innerWidth) {
+        portrait = true;
+        hcky.rotate();
+      } else if (portrait && window.innerHeight < window.innerWidth) {
+        portrait = false;
+        hcky.nhl();
+      }
+    }, false);
+    //Hcky('js-nhl').nhl();
+  </script>
+</body>
+</html>
